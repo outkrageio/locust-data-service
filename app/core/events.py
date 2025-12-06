@@ -1,9 +1,11 @@
 """Application lifecycle events."""
+
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
+
 from app.db.session import engine
 
 logger = logging.getLogger(__name__)

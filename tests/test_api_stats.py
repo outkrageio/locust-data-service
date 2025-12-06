@@ -1,4 +1,5 @@
 """Tests for stats snapshot API endpoints."""
+
 from uuid import uuid4
 
 import pytest
@@ -32,11 +33,9 @@ async def test_list_stats_snapshots(client: AsyncClient, test_run_data, stats_sn
 
     # Create multiple stats snapshots
     for i in range(5):
-        await client.post("/api/v1/stats", json={
-            **stats_snapshot_data,
-            "test_run_id": test_run_id,
-            "total_requests": (i + 1) * 100
-        })
+        await client.post(
+            "/api/v1/stats", json={**stats_snapshot_data, "test_run_id": test_run_id, "total_requests": (i + 1) * 100}
+        )
 
     # List stats snapshots
     response = await client.get(f"/api/v1/stats?test_run_id={test_run_id}")
@@ -54,10 +53,7 @@ async def test_get_stats_snapshot(client: AsyncClient, test_run_data, stats_snap
     test_run_response = await client.post("/api/v1/test-runs", json=test_run_data)
     test_run_id = test_run_response.json()["id"]
 
-    create_response = await client.post("/api/v1/stats", json={
-        **stats_snapshot_data,
-        "test_run_id": test_run_id
-    })
+    create_response = await client.post("/api/v1/stats", json={**stats_snapshot_data, "test_run_id": test_run_id})
     stats_id = create_response.json()["id"]
 
     # Get the stats snapshot
@@ -83,11 +79,8 @@ async def test_pagination_stats(client: AsyncClient, test_run_data, stats_snapsh
     test_run_id = test_run_response.json()["id"]
 
     # Create 10 stats snapshots
-    for i in range(10):
-        await client.post("/api/v1/stats", json={
-            **stats_snapshot_data,
-            "test_run_id": test_run_id
-        })
+    for _ in range(10):
+        await client.post("/api/v1/stats", json={**stats_snapshot_data, "test_run_id": test_run_id})
 
     # Get first 5
     response = await client.get(f"/api/v1/stats?test_run_id={test_run_id}&skip=0&limit=5")

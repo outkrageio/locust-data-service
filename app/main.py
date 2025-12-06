@@ -1,4 +1,5 @@
 """Main FastAPI application."""
+
 import logging
 
 from fastapi import FastAPI
@@ -9,8 +10,7 @@ from app.core.config import settings
 from app.core.events import lifespan
 
 logging.basicConfig(
-    level=getattr(logging, settings.log_level.upper()),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=getattr(logging, settings.log_level.upper()), format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ app = FastAPI(
     description="FastAPI service for storing historical Locust test run data",
     version="0.1.0",
     lifespan=lifespan,
-    debug=settings.debug
+    debug=settings.debug,
 )
 
 app.add_middleware(
@@ -37,8 +37,4 @@ app.include_router(api_router, prefix=settings.api_v1_prefix)
 @app.get("/")
 async def root():
     """Root endpoint."""
-    return {
-        "message": "Locust Data Service API",
-        "docs": "/docs",
-        "health": f"{settings.api_v1_prefix}/health"
-    }
+    return {"message": "Locust Data Service API", "docs": "/docs", "health": f"{settings.api_v1_prefix}/health"}

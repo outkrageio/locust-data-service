@@ -14,10 +14,7 @@ router = APIRouter()
 
 
 @router.post("", response_model=StatsSnapshotResponse, status_code=201)
-async def create_stats_snapshot(
-    stats: StatsSnapshotCreate,
-    db: AsyncSession = Depends(get_db)
-):
+async def create_stats_snapshot(stats: StatsSnapshotCreate, db: AsyncSession = Depends(get_db)):
     repo = StatsSnapshotRepository(db)
     created = await repo.create(**stats.model_dump())
     return created
@@ -28,7 +25,7 @@ async def list_stats_snapshots(
     test_run_id: UUID = Query(...),
     skip: int = Query(0, ge=0),
     limit: int = Query(1000, ge=1, le=10000),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """List stats snapshots for a specific test run, ordered by timestamp."""
     repo = StatsSnapshotRepository(db)
@@ -37,10 +34,7 @@ async def list_stats_snapshots(
 
 
 @router.get("/{stats_id}", response_model=StatsSnapshotResponse)
-async def get_stats_snapshot(
-    stats_id: UUID,
-    db: AsyncSession = Depends(get_db)
-):
+async def get_stats_snapshot(stats_id: UUID, db: AsyncSession = Depends(get_db)):
     repo = StatsSnapshotRepository(db)
     stats = await repo.get_by_id(stats_id)
     if not stats:

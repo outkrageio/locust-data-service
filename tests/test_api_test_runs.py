@@ -1,5 +1,6 @@
 """Tests for test run API endpoints."""
-from datetime import datetime, timedelta
+
+from datetime import datetime
 from uuid import uuid4
 
 import pytest
@@ -103,10 +104,7 @@ async def test_update_test_run(client: AsyncClient, test_run_data):
     test_run_id = create_response.json()["id"]
 
     # Update the test run
-    update_data = {
-        "status": "completed",
-        "end_time": datetime.utcnow().isoformat()
-    }
+    update_data = {"status": "completed", "end_time": datetime.utcnow().isoformat()}
     response = await client.patch(f"/api/v1/test-runs/{test_run_id}", json=update_data)
     assert response.status_code == 200
     data = response.json()

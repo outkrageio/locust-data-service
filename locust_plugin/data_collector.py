@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -19,7 +19,7 @@ class LocustDataCollector:
         service_url: str,
         project: str,
         test_name: str,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
         batch_size: int = 50,
         batch_interval: float = 5.0,
     ):
@@ -30,9 +30,9 @@ class LocustDataCollector:
         self.batch_size = batch_size
         self.batch_interval = batch_interval
 
-        self.test_run_id: Optional[UUID] = None
+        self.test_run_id: UUID | None = None
         self.client = httpx.AsyncClient(timeout=10.0)
-        self.request_batch: list[Dict[str, Any]] = []
+        self.request_batch: list[dict[str, Any]] = []
         self.last_batch_send = datetime.utcnow()
 
         events.test_start.add_listener(self.on_test_start)
@@ -103,8 +103,8 @@ class LocustDataCollector:
         name: str,
         response_time: float,
         response_length: int,
-        exception: Optional[Exception],
-        context: Dict[str, Any],
+        exception: Exception | None,
+        context: dict[str, Any],
         **kwargs,
     ):
         if not self.test_run_id:

@@ -1,4 +1,3 @@
-from typing import List
 from uuid import UUID
 
 from sqlalchemy import select
@@ -14,12 +13,7 @@ class StatsSnapshotRepository(BaseRepository[StatsSnapshot]):
     def __init__(self, session: AsyncSession):
         super().__init__(StatsSnapshot, session)
 
-    async def get_by_test_run(
-        self,
-        test_run_id: UUID,
-        skip: int = 0,
-        limit: int = 1000
-    ) -> List[StatsSnapshot]:
+    async def get_by_test_run(self, test_run_id: UUID, skip: int = 0, limit: int = 1000) -> list[StatsSnapshot]:
         result = await self.session.execute(
             select(StatsSnapshot)
             .where(StatsSnapshot.test_run_id == test_run_id)

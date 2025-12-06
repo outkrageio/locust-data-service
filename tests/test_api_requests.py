@@ -1,4 +1,5 @@
 """Tests for request log API endpoints."""
+
 from uuid import uuid4
 
 import pytest
@@ -32,10 +33,7 @@ async def test_create_request_logs_batch(client: AsyncClient, test_run_data, req
 
     # Create batch of request logs
     batch_data = {
-        "requests": [
-            {**request_log_data, "test_run_id": test_run_id, "name": f"/api/endpoint-{i}"}
-            for i in range(10)
-        ]
+        "requests": [{**request_log_data, "test_run_id": test_run_id, "name": f"/api/endpoint-{i}"} for i in range(10)]
     }
     response = await client.post("/api/v1/requests/batch", json=batch_data)
     assert response.status_code == 201
@@ -53,11 +51,9 @@ async def test_list_request_logs(client: AsyncClient, test_run_data, request_log
 
     # Create multiple request logs
     for i in range(3):
-        await client.post("/api/v1/requests", json={
-            **request_log_data,
-            "test_run_id": test_run_id,
-            "name": f"/api/endpoint-{i}"
-        })
+        await client.post(
+            "/api/v1/requests", json={**request_log_data, "test_run_id": test_run_id, "name": f"/api/endpoint-{i}"}
+        )
 
     # List request logs
     response = await client.get(f"/api/v1/requests?test_run_id={test_run_id}")
@@ -74,17 +70,11 @@ async def test_list_failed_requests(client: AsyncClient, test_run_data, request_
     test_run_id = test_run_response.json()["id"]
 
     # Create successful and failed requests
-    await client.post("/api/v1/requests", json={
-        **request_log_data,
-        "test_run_id": test_run_id,
-        "success": True
-    })
-    await client.post("/api/v1/requests", json={
-        **request_log_data,
-        "test_run_id": test_run_id,
-        "success": False,
-        "exception": "Connection timeout"
-    })
+    await client.post("/api/v1/requests", json={**request_log_data, "test_run_id": test_run_id, "success": True})
+    await client.post(
+        "/api/v1/requests",
+        json={**request_log_data, "test_run_id": test_run_id, "success": False, "exception": "Connection timeout"},
+    )
 
     # List failed requests only
     response = await client.get(f"/api/v1/requests?test_run_id={test_run_id}&failed_only=true")
@@ -101,10 +91,7 @@ async def test_get_request_log(client: AsyncClient, test_run_data, request_log_d
     test_run_response = await client.post("/api/v1/test-runs", json=test_run_data)
     test_run_id = test_run_response.json()["id"]
 
-    create_response = await client.post("/api/v1/requests", json={
-        **request_log_data,
-        "test_run_id": test_run_id
-    })
+    create_response = await client.post("/api/v1/requests", json={**request_log_data, "test_run_id": test_run_id})
     request_log_id = create_response.json()["id"]
 
     # Get the request log
@@ -131,12 +118,15 @@ async def test_get_request_stats(client: AsyncClient, test_run_data, request_log
 
     # Create multiple request logs with varying response times
     for i in range(10):
-        await client.post("/api/v1/requests", json={
-            **request_log_data,
-            "test_run_id": test_run_id,
-            "response_time": 100 + (i * 10),
-            "success": i % 2 == 0  # Half successful, half failed
-        })
+        await client.post(
+            "/api/v1/requests",
+            json={
+                **request_log_data,
+                "test_run_id": test_run_id,
+                "response_time": 100 + (i * 10),
+                "success": i % 2 == 0,  # Half successful, half failed
+            },
+        )
 
     # Get statistics
     response = await client.get(f"/api/v1/requests/stats/{test_run_id}")

@@ -1,4 +1,5 @@
 """Tests for failure API endpoints."""
+
 from uuid import uuid4
 
 import pytest
@@ -32,12 +33,10 @@ async def test_list_failures(client: AsyncClient, test_run_data, failure_data):
 
     # Create multiple failures
     for i in range(3):
-        await client.post("/api/v1/failures", json={
-            **failure_data,
-            "test_run_id": test_run_id,
-            "error_message": f"Error {i}",
-            "occurrences": i + 1
-        })
+        await client.post(
+            "/api/v1/failures",
+            json={**failure_data, "test_run_id": test_run_id, "error_message": f"Error {i}", "occurrences": i + 1},
+        )
 
     # List failures
     response = await client.get(f"/api/v1/failures?test_run_id={test_run_id}")
@@ -55,10 +54,7 @@ async def test_get_failure(client: AsyncClient, test_run_data, failure_data):
     test_run_response = await client.post("/api/v1/test-runs", json=test_run_data)
     test_run_id = test_run_response.json()["id"]
 
-    create_response = await client.post("/api/v1/failures", json={
-        **failure_data,
-        "test_run_id": test_run_id
-    })
+    create_response = await client.post("/api/v1/failures", json={**failure_data, "test_run_id": test_run_id})
     failure_id = create_response.json()["id"]
 
     # Get the failure
@@ -85,11 +81,9 @@ async def test_pagination_failures(client: AsyncClient, test_run_data, failure_d
 
     # Create 5 failures
     for i in range(5):
-        await client.post("/api/v1/failures", json={
-            **failure_data,
-            "test_run_id": test_run_id,
-            "error_message": f"Error {i}"
-        })
+        await client.post(
+            "/api/v1/failures", json={**failure_data, "test_run_id": test_run_id, "error_message": f"Error {i}"}
+        )
 
     # Get first 2
     response = await client.get(f"/api/v1/failures?test_run_id={test_run_id}&skip=0&limit=2")

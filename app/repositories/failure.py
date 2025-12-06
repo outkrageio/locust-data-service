@@ -1,4 +1,3 @@
-from typing import List
 from uuid import UUID
 
 from sqlalchemy import select
@@ -14,12 +13,7 @@ class FailureRepository(BaseRepository[Failure]):
     def __init__(self, session: AsyncSession):
         super().__init__(Failure, session)
 
-    async def get_by_test_run(
-        self,
-        test_run_id: UUID,
-        skip: int = 0,
-        limit: int = 100
-    ) -> List[Failure]:
+    async def get_by_test_run(self, test_run_id: UUID, skip: int = 0, limit: int = 100) -> list[Failure]:
         result = await self.session.execute(
             select(Failure)
             .where(Failure.test_run_id == test_run_id)

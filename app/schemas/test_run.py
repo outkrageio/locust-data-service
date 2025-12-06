@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TestRunBase(BaseModel):
@@ -11,7 +10,7 @@ class TestRunBase(BaseModel):
     user_count: int = Field(..., ge=0)
     spawn_rate: float = Field(..., ge=0)
     host: str = Field(..., max_length=512)
-    test_metadata: Optional[dict] = None
+    test_metadata: dict | None = None
 
 
 class TestRunCreate(TestRunBase):
@@ -20,9 +19,9 @@ class TestRunCreate(TestRunBase):
 
 
 class TestRunUpdate(BaseModel):
-    status: Optional[str] = Field(None, max_length=50)
-    end_time: Optional[datetime] = None
-    test_metadata: Optional[dict] = None
+    status: str | None = Field(None, max_length=50)
+    end_time: datetime | None = None
+    test_metadata: dict | None = None
 
 
 class TestRunResponse(TestRunBase):
@@ -30,7 +29,7 @@ class TestRunResponse(TestRunBase):
 
     id: UUID
     start_time: datetime
-    end_time: Optional[datetime]
+    end_time: datetime | None
     status: str
     created_at: datetime
     updated_at: datetime

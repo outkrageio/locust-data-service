@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class RequestLogBase(BaseModel):
@@ -12,9 +11,9 @@ class RequestLogBase(BaseModel):
     response_time: float = Field(..., ge=0)
     response_length: int = Field(..., ge=0)
     success: bool
-    exception: Optional[str] = Field(None, max_length=2048)
-    user_id: Optional[str] = Field(None, max_length=255)
-    context: Optional[dict] = None
+    exception: str | None = Field(None, max_length=2048)
+    user_id: str | None = Field(None, max_length=255)
+    context: dict | None = None
 
 
 class RequestLogCreate(RequestLogBase):

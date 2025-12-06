@@ -1,10 +1,17 @@
-from datetime import datetime
-from typing import Optional
+from __future__ import annotations
 
-from sqlalchemy import String, Integer, Float, DateTime, JSON, Index
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import JSON, DateTime, Float, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base, UUIDMixin, TimestampMixin
+from app.models.base import Base, TimestampMixin, UUIDMixin
+
+if TYPE_CHECKING:
+    from app.models.failure import Failure
+    from app.models.request_log import RequestLog
+    from app.models.stats_snapshot import StatsSnapshot
 
 
 class TestRun(Base, UUIDMixin, TimestampMixin):
@@ -15,27 +22,19 @@ class TestRun(Base, UUIDMixin, TimestampMixin):
     project: Mapped[str] = mapped_column(String(255), nullable=False)
     test_name: Mapped[str] = mapped_column(String(255), nullable=False)
     start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    end_time: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    end_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     user_count: Mapped[int] = mapped_column(Integer, nullable=False)
     spawn_rate: Mapped[float] = mapped_column(Float, nullable=False)
     host: Mapped[str] = mapped_column(String(512), nullable=False)
     status: Mapped[str] = mapped_column(String(50), nullable=False, default="running")
-    test_metadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    test_metadata: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    request_logs: Mapped[list["RequestLog"]] = relationship(
-        "RequestLog",
-        back_populates="test_run",
-        cascade="all, delete-orphan"
+    request_logs: Mapped[list[RequestLog]] = relationship(
+        "RequestLog", back_populates="test_run", cascade="all, delete-orphan"
     )
-    failures: Mapped[list["Failure"]] = relationship(
-        "Failure",
-        back_populates="test_run",
-        cascade="all, delete-orphan"
-    )
-    stats_snapshots: Mapped[list["StatsSnapshot"]] = relationship(
-        "StatsSnapshot",
-        back_populates="test_run",
-        cascade="all, delete-orphan"
+    failures: Mapped[list[Failure]] = relationship("Failure", back_populates="test_run", cascade="all, delete-orphan")
+    stats_snapshots: Mapped[list[StatsSnapshot]] = relationship(
+        "StatsSnapshot", back_populates="test_run", cascade="all, delete-orphan"
     )
 
     __table_args__ = (
