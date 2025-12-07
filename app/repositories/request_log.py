@@ -98,3 +98,25 @@ class RequestLogRepository(BaseRepository[RequestLog]):
             )
 
         return stats
+
+    async def get_bandwidth_stats(self, test_run_id: UUID) -> dict[str, Any]:
+        """Get bandwidth and data transfer statistics for a test run."""
+        result = await self.session.execute(
+            select(
+                func.sum(RequestLog.response_length).label("total_bytes"),
+                func.avg(RequestLog.response_length).label("avg_bytes_per_request"),
+                func.count(RequestLog.id).label("total_requests"),
+            ).where(RequestLog.test_run_id == test_run_id)
+        )
+        row = result.one()
+
+        total_bytes = row.total_bytes or 0
+        total_requests = row.total_requests or 0
+
+        return {
+            "total_bytes": total_bytes,
+            "total_mb": round(total_bytes / (1024 * 1024), 2) if total_bytes else 0,
+            "total_gb": round(total_bytes / (1024 * 1024 * 1024), 4) if total_bytes else 0,
+            "avg_bytes_per_request": float(row.avg_bytes_per_request) if row.avg_bytes_per_request else 0,
+            "total_requests": total_requests,
+        }

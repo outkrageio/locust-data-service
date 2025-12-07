@@ -54,3 +54,11 @@ class EndpointStatsResponse(BaseModel):
     min_response_time: float
     max_response_time: float
     std_dev_response_time: float
+
+
+class BandwidthStatsResponse(BaseModel):
+    total_bytes: int
+    total_mb: float
+    total_gb: float
+    avg_bytes_per_request: float
+    total_requests: int
