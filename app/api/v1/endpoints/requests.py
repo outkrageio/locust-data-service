@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.dependencies import get_db
 from app.repositories.request_log import RequestLogRepository
 from app.schemas.request_log import (
+    BandwidthStatsResponse,
+    EndpointStatsResponse,
     RequestLogBatchCreate,
     RequestLogCreate,
     RequestLogResponse,
@@ -65,4 +67,20 @@ async def get_request_stats(test_run_id: UUID, db: AsyncSession = Depends(get_db
     """Get aggregated statistics for a test run's requests."""
     repo = RequestLogRepository(db)
     stats = await repo.get_stats_by_test_run(test_run_id)
+    return stats
+
+
+@router.get("/stats/{test_run_id}/endpoints", response_model=list[EndpointStatsResponse])
+async def get_endpoint_stats(test_run_id: UUID, db: AsyncSession = Depends(get_db)):
+    """Get per-endpoint statistics for a test run's requests."""
+    repo = RequestLogRepository(db)
+    stats = await repo.get_stats_by_endpoint(test_run_id)
+    return stats
+
+
+@router.get("/stats/{test_run_id}/bandwidth", response_model=BandwidthStatsResponse)
+async def get_bandwidth_stats(test_run_id: UUID, db: AsyncSession = Depends(get_db)):
+    """Get bandwidth and data transfer statistics for a test run."""
+    repo = RequestLogRepository(db)
+    stats = await repo.get_bandwidth_stats(test_run_id)
     return stats
