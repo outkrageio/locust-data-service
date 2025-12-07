@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import failures, health, requests, stats, test_runs
+from app.api.v1.endpoints import failures, health, logs, requests, stats, test_runs
 
 api_router = APIRouter()
 
@@ -12,3 +12,4 @@ api_router.include_router(test_runs.router, prefix="/test-runs", tags=["test-run
 api_router.include_router(requests.router, prefix="/requests", tags=["requests"])
 api_router.include_router(failures.router, prefix="/failures", tags=["failures"])
 api_router.include_router(stats.router, prefix="/stats", tags=["stats"])
+api_router.include_router(logs.router, prefix="/logs", tags=["logs"])

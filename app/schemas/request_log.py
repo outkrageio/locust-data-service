@@ -42,3 +42,15 @@ class RequestStatsResponse(BaseModel):
     avg_response_time: float
     min_response_time: float
     max_response_time: float
+
+
+class EndpointStatsResponse(BaseModel):
+    endpoint: str
+    method: str
+    total_requests: int
+    failure_count: int
+    failure_rate: float
+    avg_response_time: float
+    min_response_time: float
+    max_response_time: float
+    std_dev_response_time: float

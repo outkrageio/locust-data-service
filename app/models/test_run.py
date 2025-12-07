@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from app.models.failure import Failure
     from app.models.request_log import RequestLog
     from app.models.stats_snapshot import StatsSnapshot
+    from app.models.test_log import TestLog
 
 
 class TestRun(Base, UUIDMixin, TimestampMixin):
@@ -36,6 +37,7 @@ class TestRun(Base, UUIDMixin, TimestampMixin):
     stats_snapshots: Mapped[list[StatsSnapshot]] = relationship(
         "StatsSnapshot", back_populates="test_run", cascade="all, delete-orphan"
     )
+    logs: Mapped[list[TestLog]] = relationship("TestLog", back_populates="test_run", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("idx_test_runs_project_name", "project", "test_name"),

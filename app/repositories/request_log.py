@@ -60,3 +60,41 @@ class RequestLogRepository(BaseRepository[RequestLog]):
             "min_response_time": float(row.min_response_time) if row.min_response_time else 0,
             "max_response_time": float(row.max_response_time) if row.max_response_time else 0,
         }
+
+    async def get_stats_by_endpoint(self, test_run_id: UUID) -> list[dict[str, Any]]:
+        """Get aggregated statistics grouped by endpoint."""
+        result = await self.session.execute(
+            select(
+                RequestLog.name.label("endpoint"),
+                RequestLog.request_type.label("method"),
+                func.count(RequestLog.id).label("total_requests"),
+                func.count().filter(~RequestLog.success).label("failure_count"),
+                func.avg(RequestLog.response_time).label("avg_response_time"),
+                func.min(RequestLog.response_time).label("min_response_time"),
+                func.max(RequestLog.response_time).label("max_response_time"),
+                func.stddev_pop(RequestLog.response_time).label("std_dev_response_time"),
+            )
+            .where(RequestLog.test_run_id == test_run_id)
+            .group_by(RequestLog.name, RequestLog.request_type)
+            .order_by(RequestLog.name)
+        )
+
+        stats = []
+        for row in result:
+            total = row.total_requests or 0
+            failures = row.failure_count or 0
+            stats.append(
+                {
+                    "endpoint": row.endpoint,
+                    "method": row.method,
+                    "total_requests": total,
+                    "failure_count": failures,
+                    "failure_rate": (failures / total * 100) if total else 0,
+                    "avg_response_time": float(row.avg_response_time) if row.avg_response_time else 0,
+                    "min_response_time": float(row.min_response_time) if row.min_response_time else 0,
+                    "max_response_time": float(row.max_response_time) if row.max_response_time else 0,
+                    "std_dev_response_time": float(row.std_dev_response_time) if row.std_dev_response_time else 0,
+                }
+            )
+
+        return stats
